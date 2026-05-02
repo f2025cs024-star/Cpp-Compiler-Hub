@@ -1,0 +1,16 @@
+FROM alpine:latest
+
+# Install g++ and necessary libraries
+RUN apk add --no-cache g++ build-base
+
+# Create a non-privileged user
+RUN adduser -D sandbox
+USER sandbox
+WORKDIR /home/sandbox
+
+# Set execution limits can be handled via docker run flags
+# But we can pre-set some environment vars if needed
+ENV CC=g++
+ENV CXX=g++
+
+CMD ["bash"]

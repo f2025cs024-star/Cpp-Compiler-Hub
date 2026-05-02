@@ -56,9 +56,17 @@ body {
   }
 }
 
-/* Touch devices: smoother terminal scroll */
+/* Touch devices: smoother terminal scroll + easier interaction */
 @media (hover: none) and (pointer: coarse) {
   .xterm .xterm-viewport {
     -webkit-overflow-scrolling: touch;
   }
+}
+
+.xterm {
+  touch-action: manipulation;
+}
+
+.xterm .xterm-screen {
+  cursor: text;
 }

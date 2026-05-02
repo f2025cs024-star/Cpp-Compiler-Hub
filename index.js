@@ -15,6 +15,9 @@ const db = require('./models/db');
 const socketHandlers = require('./socket/handlers');
 
 const app = express();
+// Render and other reverse proxies send X-Forwarded-For; required for express-rate-limit v8+
+app.set('trust proxy', 1);
+
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {

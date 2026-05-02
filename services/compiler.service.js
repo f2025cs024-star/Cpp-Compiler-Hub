@@ -11,7 +11,8 @@ class CompilerService {
         const id = uuidv4();
         const filename = `${id}.cpp`;
         const filepath = path.join(TEMP_DIR, filename);
-        const executable = path.join(TEMP_DIR, `${id}.exe`);
+        const exeSuffix = process.platform === 'win32' ? '.exe' : '';
+        const executable = path.join(TEMP_DIR, `${id}${exeSuffix}`);
 
         fs.writeFileSync(filepath, code);
 

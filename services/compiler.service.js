@@ -1,14 +1,14 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 const TEMP_DIR = path.join(__dirname, '../temp');
 if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR);
 
 class CompilerService {
     static async runCode(code, socket) {
-        const id = uuidv4();
+        const id = randomUUID();
         const filename = `${id}.cpp`;
         const filepath = path.join(TEMP_DIR, filename);
         const exeSuffix = process.platform === 'win32' ? '.exe' : '';

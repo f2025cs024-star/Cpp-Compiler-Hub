@@ -1,9 +1,9 @@
 const db = require('../models/db');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 exports.createProgram = async (req, res) => {
     const { title, code, language, is_public } = req.body;
-    const slug = uuidv4().slice(0, 8);
+    const slug = randomUUID().slice(0, 8);
 
     try {
         const result = db.prepare('INSERT INTO programs (slug, user_id, title, code, language, is_public) VALUES (?, ?, ?, ?, ?, ?)')

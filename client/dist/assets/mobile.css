@@ -1,0 +1,64 @@
+/* NexCPP — mobile / tablet: full-viewport column layout (matches laptop-style stacked workflow) */
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+/* Main IDE shell: two columns → stack vertically, use dynamic viewport (address bar) */
+@media (max-width: 1024px) {
+  div[style*="calc(100vh - 100px)"][style*="display:flex"] {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    height: auto !important;
+    min-height: calc(100dvh - 100px) !important;
+    max-height: none !important;
+    padding-top: max(8px, env(safe-area-inset-top, 0px)) !important;
+    padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+    padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  div[style*="calc(100vh - 100px)"][style*="display:flex"] > div {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .editor-container {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-height: 38dvh !important;
+    height: 45dvh !important;
+    max-height: 58dvh !important;
+  }
+
+  .terminal-container {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-height: 26dvh !important;
+    height: 30dvh !important;
+    max-height: 42dvh !important;
+  }
+}
+
+/* Touch devices: smoother terminal scroll */
+@media (hover: none) and (pointer: coarse) {
+  .xterm .xterm-viewport {
+    -webkit-overflow-scrolling: touch;
+  }
+}

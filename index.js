@@ -11,32 +11,72 @@ const rateLimit = require('express-rate-limit');
 // Load environment variables
 dotenv.config();
 
+const isProd = process.env.NODE_ENV === 'production';
+
+if (isProd) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret || secret === 'secret') {
+        console.error('FATAL: Set a strong JWT_SECRET in production (not the default).');
+        process.exit(1);
+    }
+}
+
 const db = require('./models/db');
 const socketHandlers = require('./socket/handlers');
 
 const app = express();
+app.disable('x-powered-by');
 // Render and other reverse proxies send X-Forwarded-For; required for express-rate-limit v8+
 app.set('trust proxy', 1);
 
+/** Comma-separated list, e.g. https://your-app.onrender.com — limits who can call API / sockets from browsers */
+const corsOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+const corsOptions =
+    corsOrigins.length > 0
+        ? { origin: corsOrigins, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] }
+        : isProd
+          ? { origin: false, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] }
+          : {};
+
+if (isProd && corsOrigins.length === 0) {
+    console.warn(
+        'SECURITY: CORS_ORIGIN is unset — only same-origin browser access is allowed. Set CORS_ORIGIN to your HTTPS URL(s) if you need another origin.'
+    );
+}
+
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+    cors:
+        corsOrigins.length > 0
+            ? { origin: corsOrigins, methods: ['GET', 'POST'] }
+            : isProd
+              ? { origin: false, methods: ['GET', 'POST'] }
+              : { origin: '*', methods: ['GET', 'POST'] },
 });
 
 // Middleware
-app.use(helmet({
-    contentSecurityPolicy: false, // For development ease with Monaco
-}));
-app.use(cors());
-app.use(express.json());
-app.use(morgan('dev'));
+app.use(
+    helmet({
+        contentSecurityPolicy: false, // Monaco / inline bootstrap need relaxed CSP; tighten in a custom build if needed
+        crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+        strictTransportSecurity: isProd
+            ? { maxAge: 15552000, includeSubDomains: true, preload: false }
+            : false,
+    })
+);
+app.use(cors(corsOptions));
+app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '256kb' }));
+app.use(isProd ? morgan('combined') : morgan('dev'));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    max: Number(process.env.API_RATE_LIMIT_MAX) || 100,
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 app.use('/api/', limiter);
 

@@ -15,3 +15,6 @@ services:
         value: production
       - key: JWT_SECRET
         generateValue: true
+      # Set in dashboard to your live HTTPS URL, e.g. https://nexcpp.onrender.com
+      - key: CORS_ORIGIN
+        sync: false

@@ -6,8 +6,18 @@ const { randomUUID } = require('crypto');
 const TEMP_DIR = path.join(__dirname, '../temp');
 if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR);
 
+const MAX_SOURCE_BYTES = Number(process.env.MAX_SOURCE_BYTES) || 400 * 1024;
+const COMPILE_TIMEOUT_MS = Number(process.env.COMPILE_TIMEOUT_MS) || 60 * 1000;
+const EXEC_TIMEOUT_MS = Number(process.env.EXEC_TIMEOUT_MS) || 5 * 60 * 1000;
+
 class CompilerService {
     static async runCode(code, socket) {
+        const buf = Buffer.byteLength(code || '', 'utf8');
+        if (buf > MAX_SOURCE_BYTES) {
+            socket.emit('stderr', `\r\n\x1b[1;31m[Source too large (max ${MAX_SOURCE_BYTES} bytes)]\x1b[0m\r\n`);
+            return { success: false, error: 'Source too large' };
+        }
+
         const id = randomUUID();
         const filename = `${id}.cpp`;
         const filepath = path.join(TEMP_DIR, filename);
@@ -27,7 +37,12 @@ class CompilerService {
                 filepath,
                 '-o',
                 executable
-            ]);
+            ], { stdio: ['ignore', 'pipe', 'pipe'] });
+
+            const compileTimer = setTimeout(() => {
+                compile.kill('SIGKILL');
+                socket.emit('stderr', '\r\n\x1b[1;31m[Compilation timed out]\x1b[0m\r\n');
+            }, COMPILE_TIMEOUT_MS);
 
             let stderr = '';
             compile.stderr.on('data', (data) => {
@@ -36,8 +51,11 @@ class CompilerService {
             });
 
             compile.on('close', (code) => {
+                clearTimeout(compileTimer);
                 if (code !== 0) {
-                    socket.emit('stderr', `\r\n\x1b[1;31m[Compilation Failed with exit code ${code}]\x1b[0m\r\n`);
+                    if (code !== null) {
+                        socket.emit('stderr', `\r\n\x1b[1;31m[Compilation Failed with exit code ${code}]\x1b[0m\r\n`);
+                    }
                     this.cleanup(filepath, executable);
                     return resolve({ success: false, error: 'Compilation Error' });
                 }
@@ -46,7 +64,7 @@ class CompilerService {
                 
                 // Execution Phase
                 const start = Date.now();
-                const child = spawn(executable);
+                const child = spawn(executable, { stdio: ['pipe', 'pipe', 'pipe'] });
 
                 // Handle STDIN from socket
                 const stdinHandler = (data) => {
@@ -64,11 +82,10 @@ class CompilerService {
                     socket.emit('stderr', data.toString());
                 });
 
-                // Timeout handling
                 const timeout = setTimeout(() => {
-                    child.kill();
-                    socket.emit('stderr', '\r\n\x1b[1;31m[Execution Timeout: 10 minute limit reached]\x1b[0m\r\n');
-                }, 600000);
+                    child.kill('SIGKILL');
+                    socket.emit('stderr', '\r\n\x1b[1;31m[Execution timed out]\x1b[0m\r\n');
+                }, EXEC_TIMEOUT_MS);
 
                 child.on('close', (exitCode) => {
                     clearTimeout(timeout);

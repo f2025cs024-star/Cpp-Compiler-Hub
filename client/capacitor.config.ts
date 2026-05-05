@@ -1,14 +1,15 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.nexcpp.compiler',
+  appId: 'com.nexcpp.app',
   appName: 'NexCPP',
   webDir: 'dist',
   bundledWebRuntime: false,
   server: {
-    // Point to the live site for a "webview app"
+    // For a real native feel, we bundle assets, but we can also use a fallback URL
     url: 'https://nexcpp-deploy-2.onrender.com',
     cleartext: false,
+    androidScheme: 'https'
   },
   android: {
     buildOptions: {
@@ -17,7 +18,7 @@ const config: CapacitorConfig = {
     allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false,
-  },
+  }
 };
 
 export default config;

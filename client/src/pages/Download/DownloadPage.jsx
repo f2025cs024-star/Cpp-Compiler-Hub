@@ -1,254 +1,194 @@
 import React, { useState, useEffect } from 'react';
+import { Download, ShieldCheck, Cpu, Package, Globe, Smartphone, Monitor, ChevronDown } from 'lucide-react';
 
-const VERSION = 'v1.0.0';
-const RELEASE_DATE = 'May 6, 2026';
-const GITHUB_RELEASE_BASE = 'https://github.com/f2025cs024-star/nexcpp-deploy/releases/download/' + VERSION;
-
-const platforms = [
-  {
-    id: 'windows-x64',
-    name: 'Windows',
-    arch: 'x64',
-    badge: 'Intel / AMD 64-bit',
-    icon: '🪟',
-    file: 'NexCPP-Setup-x64.exe',
-    size: '~12 MB',
-    sha256: 'a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2',
-    detect: () => navigator.platform.toLowerCase().includes('win') && !navigator.platform.toLowerCase().includes('arm'),
-  },
-  {
-    id: 'windows-arm64',
-    name: 'Windows',
-    arch: 'ARM64',
-    badge: 'ARM 64-bit',
-    icon: '🪟',
-    file: 'NexCPP-Setup-arm64.exe',
-    size: '~11 MB',
-    sha256: 'b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5',
-    detect: () => navigator.platform.toLowerCase().includes('arm') && navigator.userAgent.toLowerCase().includes('win'),
-  },
-  {
-    id: 'android-arm64',
-    name: 'Android',
-    arch: 'ARM64',
-    badge: 'ARM 64-bit (Most phones)',
-    icon: '🤖',
-    file: 'NexCPP-arm64.apk',
-    size: '~18 MB',
-    sha256: 'c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6',
-    detect: () => /android/i.test(navigator.userAgent) && !/x86/i.test(navigator.userAgent),
-  },
-  {
-    id: 'android-x86',
-    name: 'Android',
-    arch: 'x86_64',
-    badge: 'Intel / AMD (Emulators)',
-    icon: '🤖',
-    file: 'NexCPP-x86_64.apk',
-    size: '~19 MB',
-    sha256: 'd6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7',
-    detect: () => /android/i.test(navigator.userAgent) && /x86/i.test(navigator.userAgent),
-  },
-  {
-    id: 'linux-x64',
-    name: 'Linux',
-    arch: 'x64',
-    badge: 'Intel / AMD 64-bit',
-    icon: '🐧',
-    file: 'NexCPP-linux-x64.AppImage',
-    size: '~15 MB',
-    sha256: 'e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8',
-    detect: () => /linux/i.test(navigator.platform) && !/arm/i.test(navigator.platform),
-  },
-  {
-    id: 'linux-arm64',
-    name: 'Linux',
-    arch: 'ARM64',
-    badge: 'ARM 64-bit (Raspberry Pi)',
-    icon: '🐧',
-    file: 'NexCPP-linux-arm64.AppImage',
-    size: '~14 MB',
-    sha256: 'f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9',
-    detect: () => /linux/i.test(navigator.platform) && /arm/i.test(navigator.platform),
-  },
-];
+const REPO_OWNER = 'f2025cs024-star';
+const REPO_NAME = 'nexcpp-deploy';
+const GITHUB_API = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`;
 
 export default function DownloadPage() {
-  const [recommended, setRecommended] = useState(null);
+  const [release, setRelease] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [os, setOs] = useState('unknown');
   const [showSha, setShowSha] = useState({});
-  const [copied, setCopied] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const match = platforms.find(p => p.detect());
-    setRecommended(match ? match.id : null);
+    // Fetch latest release info from GitHub
+    fetch(GITHUB_API)
+      .then(res => res.json())
+      .then(data => {
+        setRelease(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching release:", err);
+        setLoading(false);
+      });
+
+    // Detect OS
+    const platform = window.navigator.platform.toLowerCase();
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    
+    if (userAgent.includes('android')) setOs('android');
+    else if (platform.includes('win')) setOs('windows');
+    else if (platform.includes('linux')) setOs('linux');
+    else if (platform.includes('mac')) setOs('macos');
   }, []);
 
-  const toggleSha = (id) => setShowSha(prev => ({ ...prev, [id]: !prev[id] }));
-
-  const copySha = (id, sha) => {
-    navigator.clipboard.writeText(sha);
-    setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
+  const getAsset = (filename) => {
+    if (!release) return null;
+    return release.assets.find(a => a.name === filename);
   };
 
-  const downloadUrl = (file) => `${GITHUB_RELEASE_BASE}/${file}`;
+  const formatSize = (bytes) => {
+    if (!bytes) return '--- MB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const platforms = [
+    {
+      id: 'windows-x64',
+      name: 'Windows',
+      arch: 'x64',
+      badge: 'Intel / AMD 64-bit',
+      icon: <Monitor className="w-8 h-8" />,
+      file: 'NexCPP-Setup-x64.exe',
+      type: 'windows',
+      description: 'Standard installer for most PCs'
+    },
+    {
+      id: 'windows-arm64',
+      name: 'Windows',
+      arch: 'ARM64',
+      badge: 'ARM 64-bit',
+      icon: <Cpu className="w-8 h-8" />,
+      file: 'NexCPP-Setup-arm64.exe',
+      type: 'windows',
+      description: 'Optimized for Surface & ARM laptops'
+    },
+    {
+      id: 'android-arm64',
+      name: 'Android',
+      arch: 'ARM64',
+      badge: 'ARM 64-bit',
+      icon: <Smartphone className="w-8 h-8" />,
+      file: 'NexCPP-arm64.apk',
+      type: 'android',
+      description: 'Best for modern Android phones'
+    },
+    {
+      id: 'linux-x64',
+      name: 'Linux',
+      arch: 'x64',
+      badge: 'AppImage',
+      icon: <Package className="w-8 h-8" />,
+      file: 'NexCPP-linux-x64.AppImage',
+      type: 'linux',
+      description: 'Universal Linux portable package'
+    }
+  ];
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center text-[#e6edf3]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+    </div>
+  );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d1117', color: '#e6edf3', fontFamily: "'JetBrains Mono', monospace" }}>
-      {/* Hero */}
-      <div style={{ textAlign: 'center', padding: '80px 20px 40px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.12) 0%, transparent 60%)',
-          pointerEvents: 'none'
-        }} />
-        <div style={{
-          display: 'inline-block', padding: '6px 18px', borderRadius: '20px',
-          background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.3)',
-          fontSize: '0.8rem', color: '#00d4ff', marginBottom: '16px', letterSpacing: '0.1em'
-        }}>
-          LATEST RELEASE — {VERSION}
+    <div className="min-h-screen bg-[#0d1117] text-[#e6edf3] font-sans selection:bg-cyan-500/30">
+      {/* Dynamic Header */}
+      <div className="relative pt-24 pb-16 px-4 text-center overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(0,212,255,0.1),transparent_70%)] pointer-events-none" />
+        
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-semibold mb-6 animate-fade-in">
+          <Globe size={14} />
+          LATEST VERSION: {release?.tag_name || 'v1.0.0'}
         </div>
-        <h1 style={{
-          fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900,
-          margin: '0 0 16px',
-          background: 'linear-gradient(135deg, #fff 0%, #00d4ff 50%, #7c3aed 100%)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-        }}>
-          Download NexCPP
+
+        <h1 className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-white via-cyan-400 to-purple-500 bg-clip-text text-transparent tracking-tight">
+          Native Power. <br className="hidden md:block" /> Everywhere.
         </h1>
-        <p style={{ color: '#8b949e', fontSize: '1.1rem', maxWidth: '500px', margin: '0 auto 12px' }}>
-          Your professional C++ compiler, now available as a native desktop app. No browser required.
+        
+        <p className="text-gray-400 text-xl max-w-2xl mx-auto leading-relaxed mb-8">
+          The NexCPP experience you love, now as a high-performance native application for all your devices.
         </p>
-        <div style={{ color: '#6e7681', fontSize: '0.85rem' }}>Released: {RELEASE_DATE}</div>
+
+        <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={16} className="text-green-500" />
+            Verified & Secure
+          </div>
+          <div className="w-1 h-1 rounded-full bg-gray-700" />
+          <div>Released: {release ? new Date(release.created_at).toLocaleDateString() : '---'}</div>
+        </div>
       </div>
 
-      {/* Recommended banner */}
-      {recommended && (
-        <div style={{ maxWidth: '900px', margin: '0 auto 20px', padding: '0 20px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08))',
-            border: '1px solid rgba(0,212,255,0.25)', borderRadius: '12px',
-            padding: '14px 20px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap'
-          }}>
-            <span style={{ color: '#00d4ff', fontSize: '1.2rem' }}>⚡</span>
-            <span style={{ color: '#e6edf3', fontWeight: 600 }}>We detected your platform.</span>
-            <span style={{ color: '#8b949e', fontSize: '0.9rem' }}>
-              {platforms.find(p => p.id === recommended)?.name} {platforms.find(p => p.id === recommended)?.arch} is highlighted below.
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Cards Grid */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px 60px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+      {/* Recommended Section */}
+      <div className="max-w-6xl mx-auto px-4 pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {platforms.map(p => {
-            const isRec = p.id === recommended;
-            const shaVisible = showSha[p.id];
-            const wasCopied = copied === p.id;
+            const asset = getAsset(p.file);
+            const isRecommended = p.type === os;
+            
             return (
-              <div key={p.id} style={{
-                background: isRec
-                  ? 'linear-gradient(135deg, rgba(0,212,255,0.06), rgba(124,58,237,0.06))'
-                  : 'rgba(22,27,34,0.8)',
-                border: isRec ? '1px solid rgba(0,212,255,0.4)' : '1px solid rgba(48,54,61,0.8)',
-                borderRadius: '16px',
-                padding: '24px',
-                backdropFilter: 'blur(10px)',
-                position: 'relative',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+              <div 
+                key={p.id}
+                className={`relative group bg-[#161b22]/50 border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-2 ${
+                  isRecommended ? 'border-cyan-500/50 ring-1 ring-cyan-500/20 bg-cyan-500/[0.03]' : 'border-gray-800 hover:border-gray-700'
+                }`}
               >
-                {isRec && (
-                  <div style={{
-                    position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
-                    background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
-                    borderRadius: '20px', padding: '4px 14px',
-                    fontSize: '0.72rem', fontWeight: 700, color: '#fff', letterSpacing: '0.08em', whiteSpace: 'nowrap'
-                  }}>
-                    ✓ RECOMMENDED FOR YOU
+                {isRecommended && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-widest uppercase">
+                    Recommended
                   </div>
                 )}
 
-                {/* Platform Header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <span style={{ fontSize: '2rem' }}>{p.icon}</span>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className={`p-3 rounded-xl ${isRecommended ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-800 text-gray-400'}`}>
+                    {p.icon}
+                  </div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#e6edf3' }}>{p.name}</div>
-                    <div style={{ display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
-                      <span style={{
-                        background: 'rgba(0,212,255,0.12)', border: '1px solid rgba(0,212,255,0.25)',
-                        borderRadius: '8px', padding: '2px 8px', fontSize: '0.72rem', color: '#00d4ff', fontWeight: 700
-                      }}>{p.arch}</span>
-                      <span style={{
-                        background: 'rgba(139,148,158,0.1)', border: '1px solid rgba(139,148,158,0.2)',
-                        borderRadius: '8px', padding: '2px 8px', fontSize: '0.72rem', color: '#8b949e'
-                      }}>{p.badge}</span>
-                    </div>
+                    <h3 className="font-bold text-lg">{p.name}</h3>
+                    <span className="text-xs text-gray-500 font-mono">{p.arch}</span>
                   </div>
                 </div>
 
-                {/* File info */}
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ color: '#6e7681', fontSize: '0.78rem', marginBottom: '4px' }}>FILE</div>
-                  <div style={{ color: '#8b949e', fontSize: '0.82rem', wordBreak: 'break-all' }}>{p.file}</div>
-                  <div style={{ color: '#6e7681', fontSize: '0.78rem', marginTop: '8px' }}>
-                    SIZE: <span style={{ color: '#8b949e' }}>{p.size}</span>
+                <p className="text-sm text-gray-400 mb-8 line-clamp-2 h-10">
+                  {p.description}
+                </p>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-xs text-gray-500 font-mono px-1">
+                    <span>SIZE</span>
+                    <span>{formatSize(asset?.size)}</span>
                   </div>
-                </div>
 
-                {/* Download Button */}
-                <a
-                  href={downloadUrl(p.file)}
-                  download
-                  style={{
-                    display: 'block', textAlign: 'center', padding: '10px 20px',
-                    borderRadius: '10px', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
-                    background: isRec
-                      ? 'linear-gradient(135deg, #00d4ff, #7c3aed)'
-                      : 'rgba(48,54,61,0.8)',
-                    color: '#fff',
-                    border: isRec ? 'none' : '1px solid rgba(48,54,61,1)',
-                    cursor: 'pointer', transition: 'opacity 0.2s',
-                    marginBottom: '12px'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                >
-                  ⬇ Download {p.arch}
-                </a>
-
-                {/* SHA256 Toggle */}
-                <div>
-                  <button
-                    onClick={() => toggleSha(p.id)}
-                    style={{
-                      background: 'none', border: 'none', color: '#6e7681',
-                      fontSize: '0.75rem', cursor: 'pointer', padding: '0',
-                      display: 'flex', alignItems: 'center', gap: '6px'
-                    }}
+                  <a
+                    href={asset?.browser_download_url || '#'}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
+                      asset 
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20' 
+                        : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    }`}
+                    onClick={(e) => !asset && e.preventDefault()}
                   >
-                    🔐 {shaVisible ? 'Hide' : 'Show'} SHA256 Checksum
+                    <Download size={18} />
+                    {asset ? 'Download Now' : 'Build Pending'}
+                  </a>
+
+                  <button 
+                    onClick={() => setShowSha(prev => ({...prev, [p.id]: !prev[p.id]}))}
+                    className="w-full text-[10px] text-gray-600 hover:text-gray-400 uppercase tracking-widest font-bold transition-colors"
+                  >
+                    {showSha[p.id] ? 'Hide' : 'Verify'} SHA256
                   </button>
-                  {shaVisible && (
-                    <div style={{ marginTop: '8px' }}>
-                      <div style={{
-                        background: 'rgba(0,0,0,0.3)', borderRadius: '8px', padding: '8px 10px',
-                        fontFamily: 'monospace', fontSize: '0.65rem', color: '#6e7681',
-                        wordBreak: 'break-all', cursor: 'pointer'
-                      }}
-                        onClick={() => copySha(p.id, p.sha256)}
-                        title="Click to copy"
-                      >
-                        {p.sha256}
-                      </div>
-                      <div style={{ color: '#00d4ff', fontSize: '0.7rem', marginTop: '4px' }}>
-                        {wasCopied ? '✓ Copied!' : 'Click to copy'}
-                      </div>
+
+                  {showSha[p.id] && (
+                    <div className="p-3 bg-black/40 rounded-lg border border-gray-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <p className="text-[9px] font-mono text-gray-500 break-all leading-relaxed">
+                        {/* In a real app, you'd fetch the .sha256 file content */}
+                        Available on Release Page
+                      </p>
                     </div>
                   )}
                 </div>
@@ -258,65 +198,47 @@ export default function DownloadPage() {
         </div>
 
         {/* All Platforms Dropdown */}
-        <div style={{ marginTop: '40px', textAlign: 'center' }}>
-          <button
+        <div className="mt-20 flex flex-col items-center">
+          <button 
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            style={{
-              background: 'rgba(22,27,34,0.8)', border: '1px solid rgba(48,54,61,0.8)',
-              borderRadius: '12px', padding: '12px 24px', color: '#8b949e',
-              cursor: 'pointer', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '8px'
-            }}
+            className="flex items-center gap-2 px-8 py-3 rounded-full bg-gray-800/50 border border-gray-700 text-gray-400 hover:text-white transition-colors text-sm font-medium"
           >
-            📦 All Platforms {dropdownOpen ? '▲' : '▼'}
+            Looking for other platforms? <ChevronDown size={16} className={`transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
           </button>
+
           {dropdownOpen && (
-            <div style={{
-              marginTop: '12px', background: 'rgba(22,27,34,0.95)',
-              border: '1px solid rgba(48,54,61,0.8)', borderRadius: '12px',
-              overflow: 'hidden', maxWidth: '480px', margin: '12px auto 0'
-            }}>
-              {platforms.map(p => (
-                <a
-                  key={p.id}
-                  href={downloadUrl(p.file)}
-                  download
-                  style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '12px 20px', color: '#e6edf3', textDecoration: 'none',
-                    borderBottom: '1px solid rgba(48,54,61,0.5)', fontSize: '0.85rem',
-                    transition: 'background 0.15s'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,212,255,0.05)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <span>{p.icon} {p.name} <strong>{p.arch}</strong> — {p.badge}</span>
-                  <span style={{ color: '#00d4ff', fontSize: '0.75rem' }}>↓ {p.size}</span>
-                </a>
-              ))}
+            <div className="mt-4 w-full max-w-lg bg-[#161b22] border border-gray-800 rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-2">
+                {[
+                  { name: 'Windows ARM64', file: 'NexCPP-Setup-arm64.exe' },
+                  { name: 'Android x86_64', file: 'NexCPP-x86_64.apk' },
+                  { name: 'Linux ARM64', file: 'NexCPP-linux-arm64.AppImage' },
+                  { name: 'Ubuntu (.deb)', file: 'NexCPP-linux-x64.deb' }
+                ].map(item => (
+                  <a 
+                    key={item.file}
+                    href={getAsset(item.file)?.browser_download_url || '#'}
+                    className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors group"
+                  >
+                    <span className="text-gray-300 group-hover:text-white">{item.name}</span>
+                    <Download size={14} className="text-gray-600 group-hover:text-cyan-500" />
+                  </a>
+                ))}
+              </div>
             </div>
           )}
         </div>
-
-        {/* Info Footer */}
-        <div style={{
-          marginTop: '60px', padding: '24px', borderRadius: '12px',
-          background: 'rgba(22,27,34,0.6)', border: '1px solid rgba(48,54,61,0.6)',
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px'
-        }}>
-          {[
-            { icon: '🖥️', title: 'Native Performance', desc: 'Built with Tauri — fast, lightweight, no Chromium bloat.' },
-            { icon: '🔒', title: 'Secure by Default', desc: 'Code executes in a sandboxed environment on your machine.' },
-            { icon: '📱', title: 'Android Support', desc: 'APK for Android phones and tablets, powered by Capacitor.' },
-            { icon: '🔄', title: 'Auto-Updates', desc: 'New releases auto-build via GitHub Actions CI/CD.' },
-          ].map(item => (
-            <div key={item.title}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{item.icon}</div>
-              <div style={{ fontWeight: 700, color: '#e6edf3', marginBottom: '4px' }}>{item.title}</div>
-              <div style={{ color: '#6e7681', fontSize: '0.82rem', lineHeight: '1.5' }}>{item.desc}</div>
-            </div>
-          ))}
-        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }

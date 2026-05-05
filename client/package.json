@@ -7,7 +7,15 @@
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tauri:dev": "npx tauri dev",
+    "tauri:build": "npx tauri build",
+    "tauri:build:win-x64": "npx tauri build --target x86_64-pc-windows-msvc",
+    "tauri:build:win-arm": "npx tauri build --target aarch64-pc-windows-msvc",
+    "tauri:build:linux": "npx tauri build --target x86_64-unknown-linux-gnu",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:build": "npm run build && npx cap sync android"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

@@ -16,6 +16,7 @@ const Navbar = ({ user, onLogout }) => {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <Link to="/leaderboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600' }}>Leaderboard</Link>
+        <Link to="/download" style={{ color: '#00d4ff', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '5px' }}>⬇ Download</Link>
         {user ? (
           <>
             <Link to="/dashboard" className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', padding: '8px 16px' }}>

@@ -1,0 +1,305 @@
+name: NexCPP Multi-Platform Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  # ─────────────────────────────────────────────
+  # 1. BUILD TAURI — Windows x64
+  # ─────────────────────────────────────────────
+  build-windows-x64:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+
+      - name: Build Tauri (Windows x64)
+        working-directory: client
+        run: npx tauri build --target x86_64-pc-windows-msvc
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+
+      - name: Rename artifact
+        run: |
+          mv client/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe NexCPP-Setup-x64.exe
+
+      - name: Upload Windows x64
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: NexCPP-Setup-x64.exe
+
+  # ─────────────────────────────────────────────
+  # 2. BUILD TAURI — Windows ARM64
+  # ─────────────────────────────────────────────
+  build-windows-arm64:
+    name: Windows ARM64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-pc-windows-msvc
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Build Tauri (Windows ARM64)
+        working-directory: client
+        run: npx tauri build --target aarch64-pc-windows-msvc
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+
+      - name: Rename artifact
+        run: |
+          mv client/src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/*.exe NexCPP-Setup-arm64.exe
+
+      - name: Upload Windows ARM64
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-arm64
+          path: NexCPP-Setup-arm64.exe
+
+  # ─────────────────────────────────────────────
+  # 3. BUILD TAURI — Linux x64
+  # ─────────────────────────────────────────────
+  build-linux-x64:
+    name: Linux x64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.0-dev build-essential curl wget libssl-dev \
+            libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Build Tauri (Linux x64)
+        working-directory: client
+        run: npx tauri build
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+
+      - name: Rename artifact
+        run: mv client/src-tauri/target/release/bundle/appimage/*.AppImage NexCPP-linux-x64.AppImage
+
+      - name: Upload Linux x64
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64
+          path: NexCPP-linux-x64.AppImage
+
+  # ─────────────────────────────────────────────
+  # 4. BUILD TAURI — Linux ARM64
+  # ─────────────────────────────────────────────
+  build-linux-arm64:
+    name: Linux ARM64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup Rust with ARM64 target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-gnu
+
+      - name: Install cross-compilation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu libwebkit2gtk-4.0-dev \
+            build-essential libssl-dev libgtk-3-dev librsvg2-dev
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Build Tauri (Linux ARM64)
+        working-directory: client
+        run: npx tauri build --target aarch64-unknown-linux-gnu
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          PKG_CONFIG_SYSROOT_DIR: /usr/aarch64-linux-gnu
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+
+      - name: Rename artifact
+        run: mv client/src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage/*.AppImage NexCPP-linux-arm64.AppImage
+
+      - name: Upload Linux ARM64
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64
+          path: NexCPP-linux-arm64.AppImage
+
+  # ─────────────────────────────────────────────
+  # 5. BUILD CAPACITOR — Android ARM64 + x86_64
+  # ─────────────────────────────────────────────
+  build-android:
+    name: Android APKs
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm install
+
+      - name: Build web assets
+        working-directory: client
+        run: npm run build
+
+      - name: Install Capacitor
+        working-directory: client
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap add android
+          npx cap sync android
+
+      - name: Build Android APK (ARM64)
+        working-directory: client/android
+        run: ./gradlew assembleRelease -Pandroid.injected.build.abi=arm64-v8a
+
+      - name: Build Android APK (x86_64)
+        working-directory: client/android
+        run: ./gradlew assembleRelease -Pandroid.injected.build.abi=x86_64
+
+      - name: Rename APKs
+        run: |
+          cp client/android/app/build/outputs/apk/release/app-arm64-v8a-release-unsigned.apk NexCPP-arm64.apk
+          cp client/android/app/build/outputs/apk/release/app-x86_64-release-unsigned.apk NexCPP-x86_64.apk
+
+      - name: Upload Android ARM64
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-arm64
+          path: NexCPP-arm64.apk
+
+      - name: Upload Android x86_64
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-x86_64
+          path: NexCPP-x86_64.apk
+
+  # ─────────────────────────────────────────────
+  # 6. PUBLISH — Create GitHub Release
+  # ─────────────────────────────────────────────
+  publish-release:
+    name: Publish GitHub Release
+    needs:
+      - build-windows-x64
+      - build-windows-arm64
+      - build-linux-x64
+      - build-linux-arm64
+      - build-android
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd artifacts
+          find . -type f \( -name "*.exe" -o -name "*.apk" -o -name "*.AppImage" \) -exec sha256sum {} \; > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: NexCPP ${{ github.ref_name }}
+          body: |
+            ## 🚀 NexCPP ${{ github.ref_name }} Release
+
+            Professional C++ Online Compiler — Native Desktop & Mobile Builds
+
+            ### Downloads
+            | Platform | Architecture | File |
+            |----------|-------------|------|
+            | Windows | x64 (Intel/AMD) | `NexCPP-Setup-x64.exe` |
+            | Windows | ARM64 | `NexCPP-Setup-arm64.exe` |
+            | Android | ARM64 (Most phones) | `NexCPP-arm64.apk` |
+            | Android | x86_64 (Emulators) | `NexCPP-x86_64.apk` |
+            | Linux | x64 (Intel/AMD) | `NexCPP-linux-x64.AppImage` |
+            | Linux | ARM64 (Raspberry Pi) | `NexCPP-linux-arm64.AppImage` |
+
+            ### Linux AppImage
+            ```bash
+            chmod +x NexCPP-linux-*.AppImage
+            ./NexCPP-linux-*.AppImage
+            ```
+          files: |
+            artifacts/windows-x64/NexCPP-Setup-x64.exe
+            artifacts/windows-arm64/NexCPP-Setup-arm64.exe
+            artifacts/android-arm64/NexCPP-arm64.apk
+            artifacts/android-x86_64/NexCPP-x86_64.apk
+            artifacts/linux-x64/NexCPP-linux-x64.AppImage
+            artifacts/linux-arm64/NexCPP-linux-arm64.AppImage
+            artifacts/SHA256SUMS.txt
+          generate_release_notes: true
+          draft: false
+          prerelease: false

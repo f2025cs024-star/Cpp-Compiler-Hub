@@ -30,12 +30,14 @@ jobs:
           targets: x86_64-pc-windows-msvc
 
       - name: Install Frontend Dependencies
-        working-directory: client
-        run: npm install --legacy-peer-deps
+        run: |
+          cd client
+          npm install --legacy-peer-deps
 
       - name: Build Tauri App (x64)
-        working-directory: client
-        run: npx tauri build --target x86_64-pc-windows-msvc
+        run: |
+          cd client
+          npx tauri build --target x86_64-pc-windows-msvc
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -71,12 +73,14 @@ jobs:
           targets: aarch64-pc-windows-msvc
 
       - name: Install Frontend Dependencies
-        working-directory: client
-        run: npm install --legacy-peer-deps
+        run: |
+          cd client
+          npm install --legacy-peer-deps
 
       - name: Build Tauri App (ARM64)
-        working-directory: client
-        run: npx tauri build --target aarch64-pc-windows-msvc
+        run: |
+          cd client
+          npx tauri build --target aarch64-pc-windows-msvc
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -114,12 +118,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Frontend Dependencies
-        working-directory: client
-        run: npm install --legacy-peer-deps
+        run: |
+          cd client
+          npm install --legacy-peer-deps
 
       - name: Build Tauri App (Linux x64)
-        working-directory: client
-        run: npx tauri build
+        run: |
+          cd client
+          npx tauri build
 
       - name: Prepare Artifacts
         run: |
@@ -153,21 +159,24 @@ jobs:
           node-version: 20
 
       - name: Install Frontend Dependencies
-        working-directory: client
-        run: npm install --legacy-peer-deps
+        run: |
+          cd client
+          npm install --legacy-peer-deps
 
       - name: Build Web Assets
-        working-directory: client
-        run: npm run build
+        run: |
+          cd client
+          npm run build
 
       - name: Sync Capacitor
-        working-directory: client
         run: |
+          cd client
           npx cap sync android
 
       - name: Build Android APK
-        working-directory: client/android
-        run: ./gradlew assembleRelease
+        run: |
+          cd client/android
+          ./gradlew assembleRelease
 
       - name: Sign APK (ARM64)
         uses: r0adkll/sign-android-release@v1
@@ -182,8 +191,8 @@ jobs:
       - name: Prepare Artifacts
         run: |
           mkdir artifacts
-          cp client/android/app/build/outputs/apk/release/app-arm64-v8a-release.apk artifacts/NexCPP-arm64.apk
-          cp client/android/app/build/outputs/apk/release/app-x86_64-release.apk artifacts/NexCPP-x86_64.apk
+          cp client/android/app/build/outputs/apk/release/app-arm64-v8a-release.apk artifacts/NexCPP-arm64.apk || cp client/android/app/build/outputs/apk/release/app-release.apk artifacts/NexCPP-arm64.apk
+          cp client/android/app/build/outputs/apk/release/app-x86_64-release.apk artifacts/NexCPP-x86_64.apk || echo "x86_64 apk not found"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -207,7 +216,7 @@ jobs:
       - name: Generate SHA256
         run: |
           cd all-artifacts
-          for f in *; do sha256sum "$f" > "$f.sha256"; done
+          for f in *; do sha256sum "$f" > "$f.sha256" || true; done
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

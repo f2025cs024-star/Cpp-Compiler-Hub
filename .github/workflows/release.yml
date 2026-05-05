@@ -31,7 +31,7 @@ jobs:
 
       - name: Install Frontend Dependencies
         working-directory: client
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Tauri App (x64)
         working-directory: client
@@ -72,7 +72,7 @@ jobs:
 
       - name: Install Frontend Dependencies
         working-directory: client
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Tauri App (ARM64)
         working-directory: client
@@ -115,7 +115,7 @@ jobs:
 
       - name: Install Frontend Dependencies
         working-directory: client
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Tauri App (Linux x64)
         working-directory: client
@@ -154,7 +154,7 @@ jobs:
 
       - name: Install Frontend Dependencies
         working-directory: client
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Web Assets
         working-directory: client

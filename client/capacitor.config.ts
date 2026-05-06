@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.nexcpp.app',
   appName: 'NexCPP',
   webDir: 'dist',
-  bundledWebRuntime: false,
   server: {
     // For a real native feel, we bundle assets, but we can also use a fallback URL
     url: 'https://nexcpp-deploy-2.onrender.com',

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NexCPP</string>
+    <string name="title_activity_main">NexCPP</string>
+    <string name="package_name">com.nexcpp.app</string>
+    <string name="custom_url_scheme">com.nexcpp.app</string>
+</resources>

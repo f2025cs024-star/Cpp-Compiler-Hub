@@ -176,6 +176,7 @@ jobs:
       - name: Build Android APK
         run: |
           cd client/android
+          chmod +x gradlew
           ./gradlew assembleRelease
 
       - name: Sign APK (ARM64)

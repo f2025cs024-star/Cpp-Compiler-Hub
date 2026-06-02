@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CodeEditor from '../../components/Editor/Editor';
 import TerminalComponent from '../../components/Terminal/Terminal';
-import { Play, Save, Share2, Code2, Settings, Download } from 'lucide-react';
+import { Play, Save, Share2, Code2, Settings } from 'lucide-react';
 import useSocket from '../../hooks/useSocket';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -103,38 +103,6 @@ const EditorPage = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 100px)' }}>
-      {/* Download promo banner */}
-      <div style={{
-        margin: '0 20px 10px',
-        padding: '10px 20px',
-        background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08))',
-        border: '1px solid rgba(0,212,255,0.2)',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '10px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '1.1rem' }}>⚡</span>
-          <span style={{ color: '#e6edf3', fontWeight: 600, fontSize: '0.9rem' }}>NexCPP is available as a native desktop app!</span>
-          <span style={{ color: '#8b949e', fontSize: '0.82rem' }}>Windows · Linux · Android</span>
-        </div>
-        <button
-          onClick={() => navigate('/download')}
-          style={{
-            background: 'linear-gradient(135deg, #00d4ff, #7c3aed)',
-            border: 'none', borderRadius: '8px',
-            padding: '7px 18px', color: '#fff', fontWeight: 700,
-            fontSize: '0.85rem', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '6px'
-          }}
-        >
-          <Download size={15} /> Download App
-        </button>
-      </div>
-
       <div style={{ flex: 1, padding: '0 20px', display: 'flex', gap: '20px' }}>
       <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <div className="glass" style={{ padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>

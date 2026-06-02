@@ -7,7 +7,6 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Leaderboard from './pages/Dashboard/Leaderboard';
-import DownloadPage from './pages/Download/DownloadPage';
 
 const AppContent = () => {
   const { user, loading, logout } = useContext(AuthContext);
@@ -24,7 +23,6 @@ const AppContent = () => {
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/download" element={<DownloadPage />} />
       </Routes>
     </Router>
   );

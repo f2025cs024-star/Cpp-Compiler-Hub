@@ -12,7 +12,7 @@ const CodeEditor = ({ code, setCode, theme = 'vs-dark' }) => {
         <Editor
           height="100%"
           defaultLanguage="cpp"
-          defaultValue={code}
+          value={code}
           theme={theme}
           onChange={handleEditorChange}
           options={{

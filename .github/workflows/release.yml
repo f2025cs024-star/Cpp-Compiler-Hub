@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   # ─────────────────────────────────────────────
   # 1. Windows x64 Build (NSIS & MSI Installer)
@@ -42,7 +46,7 @@ jobs:
 
       - name: Prepare Artifacts
         run: |
-          mkdir artifacts
+          mkdir -p artifacts
           cp client/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe artifacts/CppCompilerHub-Setup-x64.exe || true
           cp client/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi artifacts/CppCompilerHub-Setup-x64.msi || true
 
@@ -58,6 +62,7 @@ jobs:
   build-windows-arm64:
     name: Windows ARM64
     runs-on: windows-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -82,7 +87,7 @@ jobs:
 
       - name: Prepare Artifacts
         run: |
-          mkdir artifacts
+          mkdir -p artifacts
           cp client/src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/*.exe artifacts/CppCompilerHub-Setup-arm64.exe || true
 
       - name: Upload Artifact
@@ -97,6 +102,7 @@ jobs:
   build-macos:
     name: macOS (.dmg)
     runs-on: macos-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -119,7 +125,7 @@ jobs:
 
       - name: Prepare Artifacts
         run: |
-          mkdir artifacts
+          mkdir -p artifacts
           cp client/src-tauri/target/release/bundle/dmg/*.dmg artifacts/CppCompilerHub-macOS.dmg || true
 
       - name: Upload Artifact
@@ -134,6 +140,7 @@ jobs:
   build-linux-x64:
     name: Linux x64
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Install system dependencies
@@ -161,7 +168,7 @@ jobs:
 
       - name: Prepare Artifacts
         run: |
-          mkdir artifacts
+          mkdir -p artifacts
           cp client/src-tauri/target/release/bundle/appimage/*.AppImage artifacts/CppCompilerHub-linux-x64.AppImage || true
           cp client/src-tauri/target/release/bundle/deb/*.deb artifacts/CppCompilerHub-linux-x64.deb || true
 
@@ -177,6 +184,7 @@ jobs:
   build-android:
     name: Android APK
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Setup Java
@@ -213,7 +221,7 @@ jobs:
 
       - name: Prepare Artifacts
         run: |
-          mkdir artifacts
+          mkdir -p artifacts
           find client/android/app/build/outputs/apk -name "*.apk" -exec cp {} artifacts/CppCompilerHub.apk \; || true
 
       - name: Upload Artifact
@@ -228,6 +236,7 @@ jobs:
   publish:
     name: Publish Global Release
     needs: [build-windows-x64, build-windows-arm64, build-macos, build-linux-x64, build-android]
+    if: always() && (needs.build-windows-x64.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -247,17 +256,16 @@ jobs:
           body: |
             ## 🚀 C++ Compiler Hub ${{ github.ref_name }} Native Release
 
-            Download **C++ Compiler Hub** as a standalone application for your device:
+            Direct native installer binaries for your device:
 
-            ### 📦 Direct Downloads:
             - **Windows (x64)**: `CppCompilerHub-Setup-x64.exe`
             - **Windows (ARM64)**: `CppCompilerHub-Setup-arm64.exe`
-            - **macOS (Apple Silicon & Intel)**: `CppCompilerHub-macOS.dmg`
-            - **Linux (Portable)**: `CppCompilerHub-linux-x64.AppImage`
-            - **Linux (Ubuntu/Debian)**: `CppCompilerHub-linux-x64.deb`
+            - **macOS**: `CppCompilerHub-macOS.dmg`
+            - **Linux (AppImage)**: `CppCompilerHub-linux-x64.AppImage`
+            - **Linux (Debian/Ubuntu)**: `CppCompilerHub-linux-x64.deb`
             - **Android**: `CppCompilerHub.apk`
 
-            *All checksums (.sha256) are attached for verification.*
+            *Checksums (.sha256) are attached below for file integrity verification.*
           files: |
             all-artifacts/*
           draft: false

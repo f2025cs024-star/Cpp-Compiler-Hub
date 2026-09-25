@@ -1,0 +1,266 @@
+name: C++ Compiler Hub Multi-Platform Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # ─────────────────────────────────────────────
+  # 1. Windows x64 Build (NSIS & MSI Installer)
+  # ─────────────────────────────────────────────
+  build-windows-x64:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd client
+          npm install --legacy-peer-deps
+
+      - name: Build Tauri App (x64)
+        run: |
+          cd client
+          npx tauri build --target x86_64-pc-windows-msvc
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifacts
+          cp client/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe artifacts/CppCompilerHub-Setup-x64.exe || true
+          cp client/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi artifacts/CppCompilerHub-Setup-x64.msi || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: artifacts/
+
+  # ─────────────────────────────────────────────
+  # 2. Windows ARM64 Build (Snapdragon / Surface)
+  # ─────────────────────────────────────────────
+  build-windows-arm64:
+    name: Windows ARM64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-pc-windows-msvc
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd client
+          npm install --legacy-peer-deps
+
+      - name: Build Tauri App (ARM64)
+        run: |
+          cd client
+          npx tauri build --target aarch64-pc-windows-msvc
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifacts
+          cp client/src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/*.exe artifacts/CppCompilerHub-Setup-arm64.exe || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-arm64
+          path: artifacts/
+
+  # ─────────────────────────────────────────────
+  # 3. macOS Build (.dmg Installer)
+  # ─────────────────────────────────────────────
+  build-macos:
+    name: macOS (.dmg)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd client
+          npm install --legacy-peer-deps
+
+      - name: Build Tauri App (macOS)
+        run: |
+          cd client
+          npx tauri build
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifacts
+          cp client/src-tauri/target/release/bundle/dmg/*.dmg artifacts/CppCompilerHub-macOS.dmg || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: artifacts/
+
+  # ─────────────────────────────────────────────
+  # 4. Linux x64 Build (AppImage + Deb)
+  # ─────────────────────────────────────────────
+  build-linux-x64:
+    name: Linux x64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd client
+          npm install --legacy-peer-deps
+
+      - name: Build Tauri App (Linux x64)
+        run: |
+          cd client
+          npx tauri build
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifacts
+          cp client/src-tauri/target/release/bundle/appimage/*.AppImage artifacts/CppCompilerHub-linux-x64.AppImage || true
+          cp client/src-tauri/target/release/bundle/deb/*.deb artifacts/CppCompilerHub-linux-x64.deb || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64
+          path: artifacts/
+
+  # ─────────────────────────────────────────────
+  # 5. Android APK Build
+  # ─────────────────────────────────────────────
+  build-android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd client
+          npm install --legacy-peer-deps
+
+      - name: Build Web Assets
+        run: |
+          cd client
+          npm run build
+
+      - name: Sync Capacitor
+        run: |
+          cd client
+          npx cap sync android
+
+      - name: Build Android APK
+        run: |
+          cd client/android
+          chmod +x gradlew
+          ./gradlew assembleRelease || ./gradlew assembleDebug
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifacts
+          find client/android/app/build/outputs/apk -name "*.apk" -exec cp {} artifacts/CppCompilerHub.apk \; || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: artifacts/
+
+  # ─────────────────────────────────────────────
+  # 6. Publish All to GitHub Releases
+  # ─────────────────────────────────────────────
+  publish:
+    name: Publish Global Release
+    needs: [build-windows-x64, build-windows-arm64, build-macos, build-linux-x64, build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
+          merge-multiple: true
+
+      - name: Generate SHA256 Checksums
+        run: |
+          cd all-artifacts
+          for f in *; do sha256sum "$f" > "$f.sha256" || true; done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: C++ Compiler Hub ${{ github.ref_name }}
+          body: |
+            ## 🚀 C++ Compiler Hub ${{ github.ref_name }} Native Release
+
+            Download **C++ Compiler Hub** as a standalone application for your device:
+
+            ### 📦 Direct Downloads:
+            - **Windows (x64)**: `CppCompilerHub-Setup-x64.exe`
+            - **Windows (ARM64)**: `CppCompilerHub-Setup-arm64.exe`
+            - **macOS (Apple Silicon & Intel)**: `CppCompilerHub-macOS.dmg`
+            - **Linux (Portable)**: `CppCompilerHub-linux-x64.AppImage`
+            - **Linux (Ubuntu/Debian)**: `CppCompilerHub-linux-x64.deb`
+            - **Android**: `CppCompilerHub.apk`
+
+            *All checksums (.sha256) are attached for verification.*
+          files: |
+            all-artifacts/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

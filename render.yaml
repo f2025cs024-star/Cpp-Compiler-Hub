@@ -3,7 +3,7 @@
 
 services:
   - type: web
-    name: nexcpp
+    name: cppcompilerhub
     runtime: docker
     plan: free
     region: oregon

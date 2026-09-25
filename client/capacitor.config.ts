@@ -1,12 +1,11 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.nexcpp.app',
-  appName: 'NexCPP',
+  appId: 'com.cppcompilerhub.app',
+  appName: 'C++ Compiler Hub',
   webDir: 'dist',
   server: {
-    // For a real native feel, we bundle assets, but we can also use a fallback URL
-    url: 'https://nexcpp-deploy-2.onrender.com',
+    url: 'https://cpp-compiler-hub.onrender.com',
     cleartext: false,
     androidScheme: 'https'
   },

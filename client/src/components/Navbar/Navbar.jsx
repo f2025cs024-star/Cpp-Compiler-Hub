@@ -9,8 +9,8 @@ const Navbar = ({ user, onLogout }) => {
         <div style={{ background: 'var(--gradient-primary)', padding: '8px', borderRadius: '10px', display: 'flex' }}>
           <Zap size={24} color="white" fill="white" />
         </div>
-        <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'white', letterSpacing: '-0.5px' }}>
-          Nex<span className="gradient-text">CPP</span>
+        <span style={{ fontSize: '1.4rem', fontWeight: '800', color: 'white', letterSpacing: '-0.5px' }}>
+          C++ Compiler <span className="gradient-text">Hub</span>
         </span>
       </Link>
 

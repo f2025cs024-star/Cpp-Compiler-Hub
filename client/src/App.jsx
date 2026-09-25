@@ -11,7 +11,7 @@ import Leaderboard from './pages/Dashboard/Leaderboard';
 const AppContent = () => {
   const { user, loading, logout } = useContext(AuthContext);
 
-  if (loading) return <div className="glass" style={{ margin: '100px auto', width: '200px', padding: '20px', textAlign: 'center' }}>Loading NexCPP...</div>;
+  if (loading) return <div className="glass" style={{ margin: '100px auto', width: '240px', padding: '20px', textAlign: 'center' }}>Loading C++ Compiler Hub...</div>;
 
   return (
     <Router>

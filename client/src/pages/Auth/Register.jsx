@@ -29,7 +29,7 @@ const Register = () => {
         className="glass" 
         style={{ padding: '40px', width: '100%', maxWidth: '450px' }}
       >
-        <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '10px' }}>Join <span className="gradient-text">NexCPP</span></h2>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '10px' }}>Join <span className="gradient-text">C++ Compiler Hub</span></h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>Start your C++ journey with cloud storage and interactive tools.</p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

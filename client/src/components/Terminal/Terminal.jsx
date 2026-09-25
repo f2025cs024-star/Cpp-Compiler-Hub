@@ -32,7 +32,7 @@ const TerminalComponent = ({ socket }) => {
     xtermRef.current = term;
     fitAddonRef.current = fitAddon;
 
-    term.writeln('\x1b[1;36mNexCPP Interactive Terminal\x1b[0m');
+    term.writeln('\x1b[1;36mC++ Compiler Hub Interactive Terminal\x1b[0m');
     term.writeln('Press "Run" to start execution.\r\n');
 
     // Handle incoming data from server

@@ -26,6 +26,9 @@ const CodeEditor = ({ code, setCode, theme = 'vs-dark' }) => {
             bracketPairColorization: { enabled: true },
             formatOnPaste: true,
             autoIndent: 'full',
+            contextmenu: true,
+            selectOnLineNumbers: true,
+            copyWithSyntaxHighlighting: false,
           }}
           onMount={(editor, monaco) => {
             // Define custom theme if needed

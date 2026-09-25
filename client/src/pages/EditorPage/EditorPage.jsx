@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CodeEditor from '../../components/Editor/Editor';
 import TerminalComponent from '../../components/Terminal/Terminal';
-import { Play, Save, Share2, Code2, Settings } from 'lucide-react';
+import { Play, Save, Share2, Code2, Settings, Copy, Check } from 'lucide-react';
 import useSocket from '../../hooks/useSocket';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -24,7 +24,18 @@ const EditorPage = () => {
   const [programId, setProgramId] = useState(null);
   const [savedSlug, setSavedSlug] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
+  const [codeCopied, setCodeCopied] = useState(false);
   const socket = useSocket();
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+  };
 
   useEffect(() => {
     if (!slugParam) return;
@@ -133,6 +144,9 @@ const EditorPage = () => {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <button type="button" className="btn-secondary" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={handleCopyCode} title="Copy code to clipboard">
+              {codeCopied ? <Check size={18} color="#00d4ff" /> : <Copy size={18} />} {codeCopied ? 'Copied' : 'Copy'}
+            </button>
             <button type="button" className="btn-secondary" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={handleSave} title="Save to your account">
               <Save size={18} /> Save
             </button>

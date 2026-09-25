@@ -2,11 +2,73 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+
+    <!-- Primary SEO Meta Tags -->
+    <title>NexCPP — Interactive Real-Time C++ Online Compiler &amp; Cloud IDE</title>
+    <meta name="title" content="NexCPP — Interactive Real-Time C++ Online Compiler &amp; Cloud IDE" />
+    <meta name="description" content="NexCPP is a high-performance, interactive online C++ compiler and cloud IDE. Compile and run C++17 code in real-time with live terminal streaming (stdin/stdout) via WebSockets." />
+    <meta name="keywords" content="NexCPP, C++ online compiler, interactive C++ compiler, online C++ IDE, run C++ online, real-time terminal, C++ stdin, web C++ compiler, Monaco editor C++, learn C++" />
+    <meta name="author" content="Talha Zubair" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://nexcpp-deploy.onrender.com/" />
+    <meta name="theme-color" content="#0d1117" />
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nexcpp-deploy.onrender.com/" />
+    <meta property="og:title" content="NexCPP — Interactive Real-Time C++ Online Compiler &amp; Cloud IDE" />
+    <meta property="og:description" content="Compile and run C++17 in your browser with real-time interactive terminal streaming (stdin/stdout), Monaco Editor, and cloud storage." />
+    <meta property="og:site_name" content="NexCPP" />
+    <meta property="og:image" content="https://nexcpp-deploy.onrender.com/favicon.svg" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://nexcpp-deploy.onrender.com/" />
+    <meta name="twitter:title" content="NexCPP — Interactive Real-Time C++ Online Compiler &amp; Cloud IDE" />
+    <meta name="twitter:description" content="Compile and run C++17 in your browser with real-time interactive terminal streaming (stdin/stdout), Monaco Editor, and cloud storage." />
+    <meta name="twitter:image" content="https://nexcpp-deploy.onrender.com/favicon.svg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Structured Data (Schema.org JSON-LD for Google Rich Results) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "NexCPP",
+        "url": "https://nexcpp-deploy.onrender.com/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "description": "Interactive online C++ compiler and cloud IDE featuring real-time terminal streaming, standard input/output (stdin/stdout) execution, and Monaco editor integration.",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "author": {
+          "@type": "Person",
+          "name": "Talha Zubair"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Real-time stdin/stdout interactive terminal streaming via Socket.IO",
+          "C++17 compilation with -O2 optimization",
+          "Monaco code editor with syntax highlighting",
+          "User dashboard with cloud storage for C++ snippets",
+          "Global leaderboard for community programs"
+        ]
+      }
+    </script>
   </head>
   <body>
+    <noscript>
+      <div style="padding: 30px; font-family: sans-serif; text-align: center; color: #fff; background: #0d1117;">
+        <h1>NexCPP — Real-Time Interactive C++ Online Compiler</h1>
+        <p>NexCPP is a full-stack, real-time interactive C++ IDE with cloud storage and terminal streaming. Please enable JavaScript to run and compile code.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

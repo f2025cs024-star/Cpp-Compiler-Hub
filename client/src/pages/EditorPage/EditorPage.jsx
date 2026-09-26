@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import CodeEditor from '../../components/Editor/Editor';
 import TerminalComponent from '../../components/Terminal/Terminal';
@@ -174,6 +174,18 @@ const EditorPage = () => {
         </div>
       </div>
       </div>
+
+      {/* Subtle SEO-friendly footer bar */}
+      <footer style={{ marginTop: '12px', padding: '10px 15px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '10px', borderTop: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+        <div>
+          <strong style={{ color: '#f0f6fc' }}>C++ Compiler Hub</strong> — Real-time interactive C++17 compiler with live terminal streaming &amp; cin support. Modern OnlineGDB alternative.
+        </div>
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <Link to="/download" style={{ color: '#00d4ff', textDecoration: 'none', fontWeight: 600 }}>⬇ Download App</Link>
+          <Link to="/leaderboard" style={{ color: 'inherit', textDecoration: 'none' }}>Leaderboard</Link>
+          <a href="https://github.com/f2025cs024-star/Cpp-Compiler-Hub" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>GitHub</a>
+        </div>
+      </footer>
     </div>
   );
 };

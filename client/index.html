@@ -7,11 +7,11 @@
     <!-- Primary SEO Meta Tags -->
     <title>C++ Compiler Hub — Real-Time Interactive Online C++ IDE</title>
     <meta name="title" content="C++ Compiler Hub — Real-Time Interactive Online C++ IDE" />
-    <meta name="description" content="C++ Compiler Hub is a high-performance, real-time interactive online C++ IDE. Compile and run C++17 code with live terminal streaming (stdin/stdout) via WebSockets." />
-    <meta name="keywords" content="C++ Compiler Hub, C++ online compiler, interactive C++ compiler, online C++ IDE, run C++ online, real-time terminal, C++ stdin, web C++ compiler, Monaco editor C++, learn C++, online gdb alternative, C++17 compiler online, execute c++ in browser, c++ cin interactive compiler, best online c++ compiler, fast c++ compiler web, c++ code runner, online cpp editor" />
+    <meta name="description" content="C++ Compiler Hub is a modern, real-time interactive online C++ IDE and best OnlineGDB alternative. Run C++17 with live terminal streaming (cin/stdin), Monaco Editor, cloud snippets, and downloadable desktop app for Windows." />
+    <meta name="keywords" content="C++ Compiler Hub, c++ online compiler, interactive c++ compiler, online c++ IDE, run c++ online, real-time terminal, c++ stdin, c++ cin support, online c++ compiler with interactive terminal, interactive c++ code runner, onlinegdb alternative, best online gdb alternative, programiz c++ alternative, replit c++ alternative, c++17 online compiler, free c++17 code runner, download c++ compiler windows 11, c++ compiler desktop app, offline c++ compiler pwa, practice c++ programming online free, c++ online compiler for students, competitive programming c++ online, web c++ compiler, Monaco editor C++, learn C++, c++ code runner, online cpp editor, run c++ on chromebook" />
     <meta name="author" content="Talha Zubair" />
-    <meta name="subject" content="C++ Programming, Online Compiler, Developer Tools" />
-    <meta name="classification" content="Developer Tools, Computer Science, Online IDE" />
+    <meta name="subject" content="C++ Programming, Online Compiler, Developer Tools, Online IDE" />
+    <meta name="classification" content="Developer Tools, Computer Science, Online IDE, Compilers" />
     <meta name="coverage" content="Worldwide" />
     <meta name="distribution" content="Global" />
     <meta name="rating" content="General" />
@@ -26,7 +26,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://cpp-compiler-hub.onrender.com/" />
     <meta property="og:title" content="C++ Compiler Hub — Real-Time Interactive Online C++ IDE" />
-    <meta property="og:description" content="Compile and run C++17 in your browser with real-time interactive terminal streaming (stdin/stdout), Monaco Editor, and cloud storage." />
+    <meta property="og:description" content="Compile and run C++17 in your browser with real-time interactive terminal streaming (stdin/cin support), Monaco Editor, and downloadable desktop app for Windows." />
     <meta property="og:site_name" content="C++ Compiler Hub" />
     <meta property="og:image" content="https://cpp-compiler-hub.onrender.com/favicon.svg" />
 
@@ -34,48 +34,103 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://cpp-compiler-hub.onrender.com/" />
     <meta name="twitter:title" content="C++ Compiler Hub — Real-Time Interactive Online C++ IDE" />
-    <meta name="twitter:description" content="Compile and run C++17 in your browser with real-time interactive terminal streaming (stdin/stdout), Monaco Editor, and cloud storage." />
+    <meta name="twitter:description" content="Compile and run C++17 in your browser with real-time interactive terminal streaming (stdin/cin support), Monaco Editor, and downloadable desktop app for Windows." />
     <meta name="twitter:image" content="https://cpp-compiler-hub.onrender.com/favicon.svg" />
 
     <!-- Favicon & PWA Manifest -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Structured Data (Schema.org JSON-LD for Google Rich Results) -->
+    <!-- Structured Data (Schema.org WebApplication & FAQPage JSON-LD) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "C++ Compiler Hub",
-        "url": "https://cpp-compiler-hub.onrender.com/",
-        "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "All",
-        "description": "Interactive online C++ compiler and cloud IDE featuring real-time terminal streaming, standard input/output (stdin/stdout) execution, and Monaco editor integration.",
-        "browserRequirements": "Requires JavaScript. Requires HTML5.",
-        "author": {
-          "@type": "Person",
-          "name": "Talha Zubair"
-        },
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "featureList": [
-          "Real-time stdin/stdout interactive terminal streaming via Socket.IO",
-          "C++17 compilation with -O2 optimization",
-          "Monaco code editor with syntax highlighting",
-          "User dashboard with cloud storage for C++ snippets",
-          "Global leaderboard for community programs"
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "@id": "https://cpp-compiler-hub.onrender.com/#webapp",
+            "name": "C++ Compiler Hub",
+            "url": "https://cpp-compiler-hub.onrender.com/",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "All (Web, Windows, macOS, Linux, Android)",
+            "description": "Interactive online C++ compiler and cloud IDE featuring real-time terminal streaming, standard input (cin/stdin) execution, Monaco editor integration, and downloadable desktop app for Windows.",
+            "browserRequirements": "Requires JavaScript. Requires HTML5.",
+            "author": {
+              "@type": "Person",
+              "name": "Talha Zubair"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "Real-time stdin/stdout interactive terminal streaming via WebSockets",
+              "Live cin input support during execution",
+              "C++17 compilation with -O2 optimization",
+              "Monaco code editor with syntax highlighting and auto-completion",
+              "Downloadable native desktop app for Windows (PWA & standalone setup)",
+              "Modern OnlineGDB and Programiz alternative with dark theme",
+              "User dashboard with cloud storage for C++ snippets",
+              "Global leaderboard for community programs"
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://cpp-compiler-hub.onrender.com/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is C++ Compiler Hub?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "C++ Compiler Hub is a modern, high-performance online C++ compiler and cloud IDE that allows you to write, compile, and execute C++17 code directly in your browser with real-time interactive terminal input and output streaming."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does C++ Compiler Hub support cin and user input during program execution?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! Unlike traditional web compilers that require you to enter input in advance, C++ Compiler Hub uses bidirectional WebSocket streaming so you can interact with std::cin in real-time as your code runs in the terminal."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is C++ Compiler Hub a good alternative to OnlineGDB and Programiz?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, C++ Compiler Hub is built with the VS Code Monaco editor, sleek dark theme, real-time terminal streaming, zero ads, and instant execution, making it a faster and cleaner alternative to OnlineGDB and Programiz."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I download C++ Compiler Hub on my Windows PC?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, C++ Compiler Hub can be installed as an official Windows desktop application with 1 click via PWA or downloaded as a standalone installer (.exe/.cmd) from the Download page."
+                }
+              }
+            ]
+          }
         ]
       }
     </script>
   </head>
   <body>
     <noscript>
-      <div style="padding: 30px; font-family: sans-serif; text-align: center; color: #fff; background: #0d1117;">
-        <h1>C++ Compiler Hub — Real-Time Interactive C++ Online Compiler</h1>
-        <p>C++ Compiler Hub is a full-stack, real-time interactive C++ IDE with cloud storage and terminal streaming. Please enable JavaScript to run and compile code.</p>
+      <div style="padding: 40px; font-family: sans-serif; text-align: left; max-width: 800px; margin: 0 auto; color: #fff; background: #0d1117; line-height: 1.6;">
+        <h1>C++ Compiler Hub — Real-Time Interactive Online C++ IDE</h1>
+        <p>C++ Compiler Hub is a high-performance online C++ compiler and cloud IDE featuring real-time terminal streaming with live standard input (cin/stdin), Monaco Editor syntax highlighting, and cloud snippet storage.</p>
+        
+        <h2>Best OnlineGDB and Programiz Alternative</h2>
+        <p>Looking for a modern alternative to OnlineGDB or Programiz? C++ Compiler Hub provides an ad-free, dark-themed development environment with instant C++17 compilation and execution.</p>
+
+        <h2>Download C++ Compiler Hub Desktop App for Windows</h2>
+        <p>Run C++ Compiler Hub as a standalone desktop application on Windows 10 & 11 PCs. Install with one click or download the native installer from our official download page.</p>
+        
+        <h2>Ideal for Students & Competitive Programming</h2>
+        <p>Practice C++ programming online without installing compilers on your PC or Chromebook. Ideal for college coursework, data structures, algorithms, and technical interviews.</p>
       </div>
     </noscript>
     <div id="root"></div>

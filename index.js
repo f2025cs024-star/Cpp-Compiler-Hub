@@ -80,6 +80,12 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Explicit robots.txt endpoint for search engine crawlers
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain; charset=utf-8');
+    res.send("User-agent: Googlebot\nDisallow:\nAllow: /\n\nUser-agent: *\nDisallow:\nAllow: /\n\nSitemap: https://cpp-compiler-hub.onrender.com/sitemap.xml\n");
+});
+
 // Static files
 const distPath = path.join(__dirname, './client/dist');
 app.use(express.static(distPath));

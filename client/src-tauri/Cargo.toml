@@ -1,0 +1,15 @@
+[package]
+name = "cppcompilerhub"
+version = "1.2.0"
+description = "C++ Compiler Hub — Real-Time Interactive IDE"
+authors = ["C++ Compiler Hub Team"]
+edition = "2021"
+rust-version = "1.77"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

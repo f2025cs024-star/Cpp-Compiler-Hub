@@ -89,6 +89,19 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/programs', require('./routes/programs'));
 app.use('/api/users', require('./routes/users'));
 
+// Dedicated direct download endpoint
+app.get('/downloads/:file', (req, res, next) => {
+    const fs = require('fs');
+    const filename = path.basename(req.params.file);
+    const filePath = path.join(distPath, 'downloads', filename);
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Type', 'application/vnd.microsoft.portable-executable');
+        return res.sendFile(filePath);
+    }
+    next();
+});
+
 // Catch-all route to serve the frontend (SPA)
 app.use((req, res, next) => {
     if (req.path.startsWith('/api')) return next();

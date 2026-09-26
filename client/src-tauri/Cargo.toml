@@ -1,8 +1,8 @@
 [package]
-name = "nexcpp"
-version = "1.0.0"
-description = "NexCPP — Professional C++ Online Compiler"
-authors = ["NexCPP Team"]
+name = "cppcompilerhub"
+version = "1.2.0"
+description = "C++ Compiler Hub — Real-Time Interactive IDE"
+authors = ["C++ Compiler Hub Team"]
 edition = "2021"
 rust-version = "1.77"
 
@@ -13,7 +13,3 @@ tauri-build = { version = "2.0.0", features = [] }
 tauri = { version = "2.0.0", features = [] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
-[features]
-default = ["custom-protocol"]
-custom-protocol = ["tauri/custom-protocol"]

@@ -2,7 +2,8 @@
 
 **C++ Compiler Hub** is a full-stack, real-time interactive C++ IDE with cloud storage and a live terminal experience directly in your browser.
 
-🔗 **Repository:** [https://github.com/f2025cs024-star/cpp-compiler-hub](https://github.com/f2025cs024-star/cpp-compiler-hub)
+🌐 **Live Website:** [https://cpp-compiler-hub.onrender.com](https://cpp-compiler-hub.onrender.com)  
+🔗 **Repository:** [https://github.com/f2025cs024-star/Cpp-Compiler-Hub](https://github.com/f2025cs024-star/Cpp-Compiler-Hub)
 
 ## Features
 - **Real-Time Interactive Terminal**: Full stdin/stdout support via Socket.IO and Xterm.js with ANSI colors.
